@@ -1,0 +1,29 @@
+{
+    "name": "evilfreelancer/openvpn-php",
+    "description": "OpenVPN config generator writen on PHP",
+    "keywords": [
+        "openvpn",
+        "config"
+    ],
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "homepage": "http://drteam.rocks/",
+            "email": "paul@drteam.rocks",
+            "name": "Paul Rock",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "EvilFreelancer\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.0"
+    }
+}
