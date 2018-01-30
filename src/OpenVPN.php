@@ -103,6 +103,8 @@ class OpenVPN implements Interfaces\OpenVPN
      */
     public $keepalive;
 
+    public $ifconfigPoolPersist;
+
     /**
      * Regenerate key each count of seconds (disconnect the client)
      * @var int
@@ -181,6 +183,11 @@ class OpenVPN implements Interfaces\OpenVPN
      */
     public $clientDisconnect;
 
+    public $ccdExclusive;
+    public $clientToClient;
+    public $auth;
+    public $nsCertType;
+
     public function getClientConfig(): string
     {
         return $this->generateConfig(false);
@@ -194,62 +201,70 @@ class OpenVPN implements Interfaces\OpenVPN
     public function generateConfig(bool $server = false): string
     {
         $mode = $server ? 'server' : 'client';
-        $this->proto = strcasecmp($this->proto, 'tcp') ? $this->proto . '-' . $mode : $this->proto;
+        $this->proto = strtolower($this->proto);
+        $this->proto = ($this->proto == 'tcp') ? $this->proto . '-' . $mode : $this->proto;
 
-        $config = "# This config was generated automatically\n\n";
+        // Init the variable
+        $config = '';
 
         // General
         $config .= "mode $mode\n";
-        $config .= !empty($this->dev) ?? "dev " . $this->dev . "\n";
-        $config .= !empty($this->proto) ?? "proto " . $this->proto . "\n";
-        $config .= !empty($this->remote) ?? "remote " . $this->remote . "\n";
-        $config .= !empty($this->listen) ?? "listen " . $this->listen . "\n";
-        $config .= !empty($this->port) ?? "port " . $this->port . "\n";
-        $config .= !empty($this->redirectGateway) ?? "redirect-gateway\n";
-        $config .= !empty($this->httpProxy) ?? "http-proxy " . $this->httpProxy . "\n";
-        $config .= !empty($this->nobind) ?? "nobind\n";
-        $config .= !empty($this->compLzo) ?? "comp-lzo\n";
+        $config .= !empty($this->dev) ? "dev " . $this->dev . "\n" : '';
+        $config .= !empty($this->proto) ? "proto " . $this->proto . "\n" : '';
+        $config .= !empty($this->remote) ? "remote " . $this->remote . "\n" : '';
+        $config .= !empty($this->listen) ? "listen " . $this->listen . "\n" : '';
+        $config .= !empty($this->port) ? "port " . $this->port . "\n" : '';
+        $config .= !empty($this->redirectGateway) ? "redirect-gateway\n" : '';
+        $config .= !empty($this->httpProxy) ? "http-proxy " . $this->httpProxy . "\n" : '';
+        $config .= !empty($this->nobind) ? "nobind\n" : '';
+        $config .= !empty($this->compLzo) ? "comp-lzo\n" : '';
 
         // Keys and certs
         foreach ($this->getCerts() as $key => $value) {
-            $config .= (true === $value['load'] && !$server)
+            $config .= (true === $value['content'] && !$server)
                 ? "<$key>\n" . $value['content'] . "\n</$key>\n"
                 : "$key " . $value['path'] . (($key == 'tls-auth') ? ' ' . $value['option'] : null) . "\n";
         }
-        $config .= !empty($this->cipher) ?? "cipher " . $this->cipher . "\n";
-        $config .= !empty($this->tlsCipher) ?? "tls-cipher " . $this->tlsCipher . "\n";
+        $config .= !empty($this->cipher) ? "cipher " . $this->cipher . "\n" : '';
+        $config .= !empty($this->tlsCipher) ? "tls-cipher " . $this->tlsCipher . "\n" : '';
+        $config .= !empty($this->auth) ? "auth " . $this->auth . "\n" : '';
+        $config .= !empty($this->nsCertType) ? "ns-cert-type " . $this->nsCertType . "\n" : '';
 
         // Network and push
-        $config .= !empty($this->server) ?? "server " . $this->server . "\n";
+        $config .= !empty($this->server) ? "server " . $this->server . "\n" : '';
         foreach ($this->getPushes() as $push) {
-            $config .= "push " . $push . "\n";
+            $config .= "push \"" . $push . "\"\n";
         }
-        $config .= !empty($this->keepalive) ?? "keepalive " . $this->keepalive . "\n";
-        $config .= !empty($this->renegSec) ?? "reneg-sec " . $this->renegSec . "\n";
+        $config .= !empty($this->keepalive) ? "keepalive " . $this->keepalive . "\n" : '';
+        $config .= !empty($this->renegSec) ? "reneg-sec " . $this->renegSec . "\n" : '';
+        $config .= !empty($this->ifconfigPoolPersist) ? "ifconfig-pool-persist " . $this->ifconfigPoolPersist . "\n" : '';
 
         // Security
-        $config .= !empty($this->user) ?? "user " . $this->user . "\n";
-        $config .= !empty($this->group) ?? "group " . $this->group . "\n";
-        $config .= !empty($this->persistKey) ?? "persist-key\n";
-        $config .= !empty($this->persistTun) ?? "persist-tun\n";
-        $config .= !empty($this->remoteCertTls) ?? "remote-cert-tls " . $this->remoteCertTls . "\n";
-        $config .= !empty($this->authUserPass) ?? "auth-user-pass\n";
-        $config .= !empty($this->authNocache) ?? "auth-nocache\n";
-        $config .= !empty($this->scriptSecurity) ?? "script-security " . $this->scriptSecurity . "\n";
+        $config .= !empty($this->user) ? "user " . $this->user . "\n" : '';
+        $config .= !empty($this->group) ? "group " . $this->group . "\n" : '';
+        $config .= !empty($this->persistKey) ? "persist-key\n" : '';
+        $config .= !empty($this->persistTun) ? "persist-tun\n" : '';
+        $config .= !empty($this->remoteCertTls) ? "remote-cert-tls " . $this->remoteCertTls . "\n" : '';
+        $config .= !empty($this->authUserPass) ? "auth-user-pass\n" : '';
+        $config .= !empty($this->authNocache) ? "auth-nocache\n" : '';
+        $config .= !empty($this->scriptSecurity) ? "script-security " . $this->scriptSecurity . "\n" : '';
 
         // Logs
-        $config .= !empty($this->verb) ?? "verb " . $this->verb . "\n";
-        $config .= !empty($this->mute) ?? "mute " . $this->mute . "\n";
-        $config .= !empty($this->status) ?? "status " . $this->status . "\n";
-        $config .= !empty($this->logAppend) ?? "log-append " . $this->logAppend . "\n";
+        $config .= !empty($this->verb) ? "verb " . $this->verb . "\n" : '';
+        $config .= !empty($this->mute) ? "mute " . $this->mute . "\n" : '';
+        $config .= !empty($this->status) ? "status " . $this->status . "\n" : '';
+        $config .= !empty($this->logAppend) ? "log-append " . $this->logAppend . "\n" : '';
 
         // Authorization
-        $config .= !empty($this->usernameAsCommonName) ?? "username-as-common-name\n";
-        $config .= !empty($this->verifyClientCert) ?? "verify-client-cert\n";
-        $config .= !empty($this->authUserPassVerify) ?? "auth-user-pass-verify " . $this->authUserPassVerify . "\n";
-        $config .= !empty($this->maxClients) ?? "max-clients " . $this->maxClients . "\n";
-        $config .= !empty($this->clientConnect) ?? "client-connect " . $this->clientConnect . "\n";
-        $config .= !empty($this->clientDisconnect) ?? "client-disconnect " . $this->clientDisconnect . "\n";
+        $config .= !empty($this->clientConfigDir) ? "client-config-dir\n" : '';
+        $config .= !empty($this->ccdExclusive) ? "ccd-exclusive\n" : '';
+        $config .= !empty($this->clientToClient) ? "client-to-client\n" : '';
+        $config .= !empty($this->usernameAsCommonName) ? "username-as-common-name\n" : '';
+        $config .= !empty($this->verifyClientCert) ? "verify-client-cert\n" : '';
+        $config .= !empty($this->authUserPassVerify) ? "auth-user-pass-verify " . $this->authUserPassVerify . "\n" : '';
+        $config .= !empty($this->maxClients) ? "max-clients " . $this->maxClients . "\n" : '';
+        $config .= !empty($this->clientConnect) ? "client-connect " . $this->clientConnect . "\n" : '';
+        $config .= !empty($this->clientDisconnect) ? "client-disconnect " . $this->clientDisconnect . "\n" : '';
 
         return $config;
     }
