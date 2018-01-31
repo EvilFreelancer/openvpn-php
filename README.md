@@ -6,6 +6,11 @@ OpenVPN config generator written on PHP7.
 
 ## How to use
 
+It's very simple, you need to set the required parameters, then
+generate the config and voila, everything is done.
+
+More examples [here](extra).
+
 ### Server config example
 
 For begin you need to make preparation:
@@ -110,4 +115,5 @@ echo $config;
 # Links
 
 * [OpenVPN Admin](https://github.com/Chocobozzz/OpenVPN-Admin) - Web interface for your OpenVPN server
+* [Docker for OpenVPN Admin](https://github.com/EvilFreelancer/docker-openvpn-admin) - Dockerized web panel together with OpenVPN
 * [PHP Openvpn](https://github.com/paranic/openvpn) - Yet another library for generating OpenVPN config files
