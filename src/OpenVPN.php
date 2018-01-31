@@ -221,7 +221,7 @@ class OpenVPN implements Interfaces\OpenVPN
 
         // Keys and certs
         foreach ($this->getCerts() as $key => $value) {
-            $config .= (true === $value['content'] && !$server)
+            $config .= (!empty($value['content']) && !$server)
                 ? "<$key>\n" . $value['content'] . "\n</$key>\n"
                 : "$key " . $value['path'] . (($key == 'tls-auth') ? ' ' . $value['option'] : null) . "\n";
         }
@@ -273,7 +273,7 @@ class OpenVPN implements Interfaces\OpenVPN
     {
         $type = mb_strtolower($type);
         $this->_certs[$type]['path'] = !empty($path) ? $path : null;
-        $this->_certs[$type]['content'] = (true === $load) ? file_get_contents($path) : null;
+        $this->_certs[$type]['content'] = (true === $load) ? rtrim(file_get_contents($path)) : null;
         $this->_certs[$type]['option'] = !empty($options) ? $options : null;
 
         return $this;
