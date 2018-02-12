@@ -54,24 +54,35 @@ interface OpenVPN
     public function getCerts(): array;
 
     /**
-     * Generate server config
-     *
-     * @return string
-     */
-    public function getServerConfig(): string;
-
-    /**
-     * Generate client config
-     *
-     * @return string
-     */
-    public function getClientConfig(): string;
-
-    /**
      * Generate config by parameters in memory
      *
-     * @param   bool $server - Mode of work, client by default default
      * @return  string
      */
-    public function generateConfig(bool $server = false): string;
+    public function generateConfig(): string;
+
+    /**
+     * Add some new parameter to the list of parameters
+     *
+     * @example $this->addParam('client')->addParam('remote', 'vpn.example.com');
+     * @param   string $name - Name of parameter
+     * @param   string|bool|null $value - Value of parameter
+     * @return  OpenVPN
+     */
+    public function addParam(string $name, $value = null): OpenVPN;
+
+    /**
+     * Get full list of parameters, or some custom element
+     *
+     * @param   string|null $name - Name of parameter
+     * @return  array
+     */
+    public function getParams(string $name = null): array;
+
+    /**
+     * Remove some parameter from array by name
+     *
+     * @param   string $name - Name of parameter
+     * @return  OpenVPN
+     */
+    public function delParam(string $name): OpenVPN;
 }
