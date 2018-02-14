@@ -28,7 +28,7 @@ class OpenVPN implements Interfaces\OpenVPN
         $config = '';
 
         foreach ($this->getParams() as $param) {
-            $config .= $param['name'] . (!empty($param['value']) ? ' ' . $param['value'] : '') . "\n";
+            $config .= $param['name'] . ((mb_strlen($param['value']) > 0) ? ' ' . (string)$param['value'] : '') . "\n";
         }
 
         // Keys and certs
