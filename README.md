@@ -24,12 +24,13 @@ $_ovpn = new EvilFreelancer\OpenVPN();
 
 $_ovpn
     ->addParam('client')
+    ->addParam('tls-client')
     ->addParam('dev', 'tun')
     ->addParam('proto', 'tcp-client')
     ->addParam('port', '1194')
     ->addParam('resolv-retry', 'infinite')
     ->addParam('cipher', 'AES-256-CBC')
-    ->addParam('redirect-gateway', true);
+    ->addParam('redirect-gateway');
 
 $_ovpn
     ->addCert('ca', '/etc/openvpn/ca.crt', true)
@@ -38,18 +39,16 @@ $_ovpn
 $_ovpn
     ->addParam('key-direction', 1)
     ->addParam('remote-cert-tls', 'server')
-    ->addParam('auth-user-pass', true)
-    ->addParam('auth-nocache', true)
-    ->addParam('nobind', true)
-    ->addParam('persist-key', true)
-    ->addParam('persist-tun', true)
-    ->addParam('comp-lzo', true)
+    ->addParam('auth-user-pass')
+    ->addParam('auth-nocache')
+    ->addParam('nobind')
+    ->addParam('persist-key')
+    ->addParam('persist-tun')
+    ->addParam('comp-lzo')
     ->addParam('verb', 3);
 
 $_ovpn
     ->addParam('http-proxy', 'proxy-http.example.com 3128');
-
-echo $_ovpn->generateConfig();
 ```
 
 Now you can generate your client configuration file:
@@ -62,7 +61,7 @@ header("Content-Disposition: attachment; filename=client.conf");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-echo $config;
+die("$config");
 ```
 
 # Links
