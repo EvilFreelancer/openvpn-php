@@ -12,7 +12,7 @@ most of the parameters were available. as variables.
 It's very simple, you need to set the required parameters, then
 generate the config and voila, everything is done.
 
-More examples [here](extra).
+More examples [here](examples).
 
 ### Client config example
 
@@ -20,7 +20,10 @@ For make client conf you need do almost same steps, just put your
 variables and generate the config:
 
 ```php
-$_ovpn = new EvilFreelancer\OpenVPN();
+<?php
+require_once __DIR__ . '/vendor/autoload.php';
+
+$_ovpn = new OpenVPN\Config();
 
 $_ovpn
     ->addParam('client')

@@ -1,5 +1,5 @@
 <?php
-use EvilFreelancer\OpenVPN;
+use OpenVPN\Config;
 use PHPUnit\Framework\TestCase;
 
 class OpenVPNTest extends TestCase
@@ -9,7 +9,7 @@ class OpenVPNTest extends TestCase
     public function __construct(string $name = null, array $data = [], string $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
-        $this->class = new OpenVPN();
+        $this->class = new Config();
     }
 
     public function testAddCert()
