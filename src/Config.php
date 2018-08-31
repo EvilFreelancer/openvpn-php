@@ -34,48 +34,59 @@ class Config implements ConfigInterface
         // Init the variable
         $config = '';
 
-        foreach ($this->getParams() as $param) {
-            $config .= $param['name'] . ((mb_strlen($param['value']) > 0) ? ' ' . $param['value'] : '') . "\n";
+        foreach ($this->getParams() as $key => $value) {
+            $config .= $key . ((\strlen($value) > 0) ? ' ' . $value : '') . "\n";
         }
 
-        // Keys and certs
-        foreach ($this->getCerts() as $key => $value) {
-            $config .= !empty($value['content'])
-                ? "<$key>\n" . $value['content'] . "\n</$key>\n"
-                : "$key " . $value['path'] . (($key === 'tls-auth') ? ' ' . $value['option'] : null) . "\n";
+        $certs = $this->getCerts();
+        if (\count($certs) > 0) {
+            $config .= "\n### Certificates\n";
+            foreach ($this->getCerts() as $key => $value) {
+                $config .= isset($value['content'])
+                    ? "<$key>\n{$value['content']}\n</$key>\n"
+                    : "$key {$value['path']}\n";
+            }
         }
 
-        // Network and push
-        foreach ($this->getPushes() as $push) {
-            $config .= 'push "' . $push . "\"\n";
+        $pushes = $this->getPushes();
+        if (\count($pushes) > 0) {
+            $config .= "\n### Networking\n";
+            foreach ($this->getPushes() as $push) {
+                $config .= 'push "' . $push . "\"\n";
+            }
         }
 
         return $config;
     }
 
     /**
+     * Import content of all listed certificates
+     */
+    public function importCerts()
+    {
+        foreach ($this->_certs as $cert) {
+            $cert['content'] = rtrim(file_get_contents($cert['path']));
+        }
+    }
+
+    /**
      * Add new cert into the configuration
      *
-     * @param   string $type - Type of certificate [ca, cert, key, dh, tls-auth]
-     * @param   string $path - Absolute or relative path to certificate
-     * @param   bool $load - Read certificate as plain text
-     * @param   int $option - Optional parameter (for tls-auth)
-     * @return  Config
+     * @param   string $type Type of certificate [ca, cert, key, dh, tls-auth]
+     * @param   string $path Absolute or relative path to certificate
+     * @return  ConfigInterface
      */
-    public function addCert(string $type, string $path, bool $load = false, int $option = 0): ConfigInterface
+    public function addCert(string $type, string $path): ConfigInterface
     {
         $type = mb_strtolower($type);
         $this->_certs[$type]['path'] = !empty($path) ? $path : null;
-        $this->_certs[$type]['content'] = (true === $load) ? rtrim(file_get_contents($path)) : null;
-        $this->_certs[$type]['option'] = !empty($option) ? $option : null;
-
         return $this;
     }
 
     /**
      * Remove selected certificate from array
      *
-     * @param   string $type - Type of certificate [ca, cert, key, dh, tls-auth]
+     * @param   string $type Type of certificate [ca, cert, key, dh, tls-auth]
      * @return  ConfigInterface
      */
     public function delCert(string $type): ConfigInterface
@@ -97,19 +108,19 @@ class Config implements ConfigInterface
     /**
      * Append new push into the array
      *
-     * @param   string $line - String with line which must be pushed
+     * @param   string $line String with line which must be pushed
      * @return  ConfigInterface
      */
     public function addPush(string $line): ConfigInterface
     {
-        $this->_pushes[] = $line;
+        $this->_pushes[] = trim($line, '"');
         return $this;
     }
 
     /**
      * Remove route line from push array
      *
-     * @param   string $line - String with line which must be pushed
+     * @param   string $line String with line which must be pushed
      * @return  ConfigInterface
      */
     public function delPush(string $line): ConfigInterface
@@ -129,26 +140,47 @@ class Config implements ConfigInterface
     }
 
     /**
-     * Add some new parameter to the list of parameters
+     * Check if value is boolean, if not then return same string
      *
-     * @example $this->addParam('client')->addParam('remote', 'vpn.example.com');
-     * @param   string $name - Name of parameter
-     * @param   string|bool|null $value - Value of parameter
-     * @return  ConfigInterface
+     * @param   mixed $value
+     * @return  mixed
      */
-    public function add(string $name, $value = null): ConfigInterface
+    public function isBool($value)
     {
         if (\is_bool($value)) {
             $value = $value ? 'true' : 'false';
         }
-        $this->_params[] = ['name' => $name, 'value' => $value];
+        return $value;
+    }
+
+    /**
+     * Add some new parameter to the list of parameters
+     *
+     * @example $this->add('client')->add('remote', 'vpn.example.com');
+     * @param   string $name Name of parameter
+     * @param   string|bool|null $value Value of parameter
+     * @return  ConfigInterface
+     */
+    public function add(string $name, $value = null): ConfigInterface
+    {
+        $name = mb_strtolower($name);
+
+        // Check if key is certificate or push, or classic parameter
+        if (\in_array($name, self::CERTS, true)) {
+            $this->addCert($name, $value);
+        } elseif ($name === 'push') {
+            $this->addPush($value);
+        } else {
+            $this->_params[$name] = $this->isBool($value);
+        }
+
         return $this;
     }
 
     /**
      * Get some custom element
      *
-     * @param   string|null $name - Name of parameter
+     * @param   string|null $name Name of parameter
      * @return  mixed
      */
     public function get(string $name)
@@ -169,7 +201,7 @@ class Config implements ConfigInterface
     /**
      * Remove some parameter from array by name
      *
-     * @param   string $name - Name of parameter
+     * @param   string $name Name of parameter
      * @return  ConfigInterface
      */
     public function del(string $name): ConfigInterface

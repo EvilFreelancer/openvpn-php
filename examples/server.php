@@ -1,31 +1,26 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$_ovpn = new OpenVPN\Config();
+// Config object
+$config = new OpenVPN\Config();
 
-$_ovpn
+// Set server options
+$config
     ->add('dev', 'tun')
     ->add('proto', 'tcp')
     ->add('port', '1194')
     ->add('resolvRetry', 'infinite')
     ->add('cipher', 'AES-256-CBC')
-    ->add('redirectGateway', 'true');
-
-$_ovpn
-    ->addCert('ca', '/etc/openvpn/ca.crt')
-    ->addCert('cert', '/etc/openvpn/server.crt')
-    ->addCert('key', '/etc/openvpn/server.key')
-    ->addCert('dh', '/etc/openvpn/dh')
-    ->addCert('tls-auth', '/etc/openvpn/ta.key', false, 0);
-
-$_ovpn->add('server', '10.8.0.0 255.255.255.0');
-
-$_ovpn
-    ->addPush('redirect-gateway def1')
-    ->addPush('dhcp-option DNS 8.8.8.8')
-    ->addPush('dhcp-option DNS 8.8.4.4');
-
-$_ovpn
+    ->add('redirectGateway', 'true')
+    ->add('ca', '/etc/openvpn/ca.crt')
+    ->add('cert', '/etc/openvpn/server.crt')
+    ->add('key', '/etc/openvpn/server.key')
+    ->add('dh', '/etc/openvpn/dh')
+    ->add('tls-auth', '/etc/openvpn/ta.key 0')
+    ->add('server', '10.8.0.0 255.255.255.0')
+    ->add('push', 'redirect-gateway def1')
+    ->add('push', 'dhcp-option DNS 8.8.8.8')
+    ->add('push', 'dhcp-option DNS 8.8.4.4')
     ->add('keepalive', '10 120')
     ->add('renegSec', 18000)
     ->add('user', 'nobody')
@@ -42,4 +37,5 @@ $_ovpn
     ->add('usernameAsCommonName', true)
     ->add('verifyClientCert', 'none');
 
-echo $_ovpn->generateConfig();
+// Generate config by options
+echo $config->generate();
