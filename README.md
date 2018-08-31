@@ -1,11 +1,8 @@
-# OpenVPN-PHP
+# OpenVPN configuration manager
 
-OpenVPN config generator written on PHP7.
+OpenVPN configuration generator/importer written on PHP7.
 
     composer require evilfreelancer/openvpn-php
-
-Version 0.1 contains the first version of the configuration generator,
-most of the parameters were available. as variables.
 
 ## How to use
 
@@ -14,57 +11,76 @@ generate the config and voila, everything is done.
 
 More examples [here](examples).
 
-### Client config example
+### Import existing OpenVPN config
 
-For make client conf you need do almost same steps, just put your
-variables and generate the config:
+For example you have `server.conf` to import this file you need create
+`\OpenVPN\Import` object and specify name of your config file.
 
 ```php
 <?php
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-$_ovpn = new OpenVPN\Config();
+// Import OpenVPN config file
+$import = new \OpenVPN\Import('server.conf');
+// or (classic way)
+$import = new \OpenVPN\();
+$import->read('server.conf');
 
-$_ovpn
-    ->addParam('client')
-    ->addParam('tls-client')
-    ->addParam('dev', 'tun')
-    ->addParam('proto', 'tcp-client')
-    ->addParam('port', '1194')
-    ->addParam('resolv-retry', 'infinite')
-    ->addParam('cipher', 'AES-256-CBC')
-    ->addParam('redirect-gateway');
-
-$_ovpn
-    ->addCert('ca', '/etc/openvpn/ca.crt', true)
-    ->addCert('tls-auth', '/etc/openvpn/ta.key', true);
-
-$_ovpn
-    ->addParam('key-direction', 1)
-    ->addParam('remote-cert-tls', 'server')
-    ->addParam('auth-user-pass')
-    ->addParam('auth-nocache')
-    ->addParam('nobind')
-    ->addParam('persist-key')
-    ->addParam('persist-tun')
-    ->addParam('comp-lzo')
-    ->addParam('verb', 3);
-
-$_ovpn
-    ->addParam('http-proxy', 'proxy-http.example.com 3128');
+// Parse configuration and return "\OpenVPN\Config" object
+$config = $import->parse();
 ```
 
-Now you can generate your client configuration file:
+In `$config` variable will be `\OpenVPN\Config` object.
+
+### Client config example
+
+For making client configuration you need just add required parameters
+and generate the config:
 
 ```php
-$config = $_ovpn->generateConfig();
+<?php
+require_once __DIR__ . '/../vendor/autoload.php';
 
+// Config object
+$config = new OpenVPN\Config();
+
+// Set client options
+$config
+    ->add('client')
+    ->add('dev', 'tun')
+    ->add('proto', 'tcp-client')
+    ->add('port', '1194')
+    ->add('resolv-retry', 'infinite')
+    ->add('cipher', 'AES-256-CBC')
+    ->add('redirect-gateway', true)
+    ->add('ca', '/etc/openvpn/ca.crt')
+    ->add('tls-auth', '/etc/openvpn/ta.key 0')
+    ->add('key-direction', 1)
+    ->add('remote-cert-tls', 'server')
+    ->add('auth-user-pass', true)
+    ->add('auth-nocache', true)
+    ->add('nobind', true)
+    ->add('persist-key', true)
+    ->add('persist-tun', true)
+    ->add('comp-lzo', true)
+    ->add('verb', 3)
+    ->add('http-proxy', 'proxy-http.example.com 3128');
+
+// Generate config by options
+echo $config->generate();
+```
+
+### Downloadable config
+
+Just a simple usage example:
+
+```php
 header('Content-Type:text/plain');
 header("Content-Disposition: attachment; filename=client.conf");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-die("$config");
+die($config->generate());
 ```
 
 # Links
