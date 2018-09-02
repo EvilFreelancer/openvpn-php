@@ -69,17 +69,31 @@ class Config implements ConfigInterface
         }
     }
 
+    private function throwIfNotInArray($key, $array)
+    {
+        if (!\in_array($key, $array, true)) {
+            throw new \RuntimeException("Key '$key' not in list of allowed [" . implode(',', $array) . ']');
+        }
+    }
+
     /**
      * Add new cert into the configuration
      *
      * @param   string $type Type of certificate [ca, cert, key, dh, tls-auth]
-     * @param   string $path Absolute or relative path to certificate
+     * @param   string $pathOrContent Absolute or relative path to certificate or content of this file
+     * @param   bool if content of file is provided
+     * @throws  \RuntimeException
      * @return  ConfigInterface
      */
-    public function addCert(string $type, string $path): ConfigInterface
+    public function addCert(string $type, string $pathOrContent, bool $isContent = false): ConfigInterface
     {
         $type = mb_strtolower($type);
-        $this->_certs[$type]['path'] = !empty($path) ? $path : null;
+        $this->throwIfNotInArray($type, self::CERTS);
+        if (true === $isContent) {
+            $this->_certs[$type]['content'] = $pathOrContent;
+        } else {
+            $this->_certs[$type]['path'] = $pathOrContent;
+        }
         return $this;
     }
 
@@ -87,12 +101,29 @@ class Config implements ConfigInterface
      * Remove selected certificate from array
      *
      * @param   string $type Type of certificate [ca, cert, key, dh, tls-auth]
+     * @throws  \RuntimeException
      * @return  ConfigInterface
      */
     public function delCert(string $type): ConfigInterface
     {
+        $type = mb_strtolower($type);
+        $this->throwIfNotInArray($type, self::CERTS);
         unset($this->_certs[$type]);
         return $this;
+    }
+
+    /**
+     * Return information about specified certificate
+     *
+     * @param   string $type
+     * @throws  \RuntimeException
+     * @return  array
+     */
+    public function getCert(string $type): array
+    {
+        $type = mb_strtolower($type);
+        $this->throwIfNotInArray($type, self::CERTS);
+        return $this->_certs[$type] ?? [];
     }
 
     /**
@@ -145,7 +176,7 @@ class Config implements ConfigInterface
      * @param   mixed $value
      * @return  mixed
      */
-    public function isBool($value)
+    private function isBool($value)
     {
         if (\is_bool($value)) {
             $value = $value ? 'true' : 'false';
@@ -185,7 +216,7 @@ class Config implements ConfigInterface
      */
     public function get(string $name)
     {
-        return $this->_params[$name];
+        return $this->_params[$name] ?? null;
     }
 
     /**
@@ -202,16 +233,24 @@ class Config implements ConfigInterface
      * Remove some parameter from array by name
      *
      * @param   string $name Name of parameter
+     * @throws  \RuntimeException
      * @return  ConfigInterface
      */
     public function del(string $name): ConfigInterface
     {
-        $this->_params = array_map(
-            function($param) use ($name) {
-                return ($param['name'] === $name) ? null : $param;
-            },
-            $this->_params
-        );
+        // Check if key is certificate or push, or classic parameter
+        if (\in_array($name, self::CERTS, true)) {
+            $this->delCert($name);
+        } elseif ($name === 'push') {
+            throw new \RuntimeException("Not possible to remove push, use 'delPush' instead");
+        } else {
+            $this->_params = array_map(
+                function($param) use ($name) {
+                    return ($param['name'] === $name) ? null : $param;
+                },
+                $this->_params
+            );
+        }
 
         return $this;
     }

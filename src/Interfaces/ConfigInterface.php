@@ -37,6 +37,7 @@ interface ConfigInterface
      *
      * @param   string $type Type of certificate [ca, cert, key, dh, tls-auth]
      * @param   string $path Absolute or relative path to certificate
+     * @throws  \RuntimeException
      * @return  ConfigInterface
      */
     public function addCert(string $type, string $path): ConfigInterface;
@@ -45,9 +46,19 @@ interface ConfigInterface
      * Remove selected certificate from array
      *
      * @param   string $type Type of certificate [ca, cert, key, dh, tls-auth]
+     * @throws  \RuntimeException
      * @return  ConfigInterface
      */
     public function delCert(string $type): ConfigInterface;
+
+    /**
+     * Return information about specified certificate
+     *
+     * @param   string $type
+     * @throws  \RuntimeException
+     * @return  array
+     */
+    public function getCert(string $type): array;
 
     /**
      * Get full list of certificates
