@@ -21,10 +21,11 @@
         }
     },
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.1",
         "ext-mbstring": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.0"
+        "phpunit/phpunit": "^7.0",
+        "larapack/dd": "^1.1"
     }
 }
