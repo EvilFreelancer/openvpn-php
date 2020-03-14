@@ -13,12 +13,139 @@ OpenVPN configuration generator/importer written on PHP7.
 
     composer require evilfreelancer/openvpn-php
 
+## Laravel framework support
+
+This library is optimized for usage as normal Laravel package, all functional is available via `\OpenVPN` facade,
+for access to (for example) client object you need:
+
+```php
+// Config og client object
+$config = \OpenVPN::getClient([
+    'dev'              => 'tun',
+    'proto'            => 'tcp',
+    'resolv-retry'     => 'infinite',
+    'cipher'           => 'AES-256-CB',
+    'redirect-gateway' => true,
+    'key-direction'    => 1,
+    'remote-cert-tls'  => 'server',
+    'auth-user-pass'   => true,
+    'auth-nocache'     => true,
+    'persist-key'      => true,
+    'persist-tun'      => true,
+    'comp-lzo'         => true,
+    'verb'             => 3,
+]);
+
+// Another way for change values
+$config->set('verb', 3);
+$config->set('nobind');
+
+// Yet another way for change values via magic methods
+$config->remote    = 'vpn.example.com 1194';
+$config->httpProxy = 'proxy-http.example.com 3128';
+
+// Set additional certificates of client
+$config->setCerts([
+    'ca'       => '/etc/openvpn/ca.crt',
+    'tls-auth' => '/etc/openvpn/ta.key 0',
+], true);
+
+// Generate config by options
+echo $config->generate();
+```
+
+It will read configuration from `configs` folder (if it was published of course), then merge your parameters to this array and in results
+you will see then `\OpenVPN\Config` object.
+
+### Laravel installation
+
+Install the package via Composer:
+
+    composer require evilfreelancer/routeros-api-php
+
+By default the package will automatically register its service provider, but
+if you are a happy owner of Laravel version less than 5.5, then in a project, which is using your package
+(after composer require is done, of course), add into`providers` block of your `config/app.php`:
+
+```php
+'providers' => [
+    // ...
+    OpenVPN\Laravel\ServiceProvider::class,
+],
+```
+
+Optionally, publish the configuration files if you want to change any defaults:
+
+    php artisan vendor:publish --provider="OpenVPN\\Laravel\\ServiceProvider"
+
+It will create two files in your `configs` folder: `openvpn-client.php` and `openvpn-server.php`.
+
 ## How to use
 
 It's very simple, you need to set the required parameters, then
 generate the config and voila, everything is done.
 
 More examples [here](examples).
+
+### Write new config in OOP style
+
+```php
+<?php
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Config object
+$config = new OpenVPN\Config();
+
+// Set server options
+$config->dev                  = 'tun';
+$config->proto                = 'tcp';
+$config->port                 = 1194;
+$config->resolvRetry          = 'infinite';
+$config->cipher               = 'AES-256-CBC';
+$config->redirectGateway      = true;
+$config->server               = '10.8.0.0 255.255.255.0';
+$config->keepalive            = '10 120';
+$config->renegSec             = 18000;
+$config->user                 = 'nobody';
+$config->group                = 'nogroup';
+$config->persistKey           = true;
+$config->persistTun           = true;
+$config->compLzo              = true;
+$config->verb                 = 3;
+$config->mute                 = 20;
+$config->status               = '/var/log/openvpn/status.log';
+$config->logAppend            = '/var/log/openvpn/openvpn.log';
+$config->clientConfigDir      = 'ccd';
+$config->scriptSecurity       = 3;
+$config->usernameAsCommonName = true;
+$config->verifyClientCert     = 'none';
+
+// Set routes which will be used by server
+$config->setRoutes([
+    '10.1.1.0 255.255.255.0',
+    '10.1.2.0 255.255.255.0',
+    '10.1.3.0 255.255.255.0',
+]);
+
+// Set additional certificates of server
+$config->setCerts([
+    'ca'       => '/etc/openvpn/ca.crt',
+    'cert'     => '/etc/openvpn/server.crt',
+    'key'      => '/etc/openvpn/server.key',
+    'dh'       => '/etc/openvpn/dh4096.crt',
+    'tls-auth' => '/etc/openvpn/ta.key 0',
+]);
+
+// Set pushes which will be passed to client
+$config->setPushes([
+    'redirect-gateway def1',
+    'dhcp-option DNS 8.8.8.8',
+    'dhcp-option DNS 8.8.4.4',
+]);
+
+// Generate config by options
+echo $config->generate();
+```
 
 ### Import existing OpenVPN config
 
@@ -32,7 +159,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 // Import OpenVPN config file
 $import = new \OpenVPN\Import('server.conf');
 // or (classic way)
-$import = new \OpenVPN\();
+$import = new \OpenVPN\Import();
 $import->read('server.conf');
 
 // Parse configuration and return "\OpenVPN\Config" object
@@ -51,29 +178,31 @@ and generate the config:
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Config object
-$config = new OpenVPN\Config();
+$config = new OpenVPN\Config(true);
 
 // Set client options
-$config
-    ->add('client')
-    ->add('dev', 'tun')
-    ->add('proto', 'tcp-client')
-    ->add('port', '1194')
-    ->add('resolv-retry', 'infinite')
-    ->add('cipher', 'AES-256-CBC')
-    ->add('redirect-gateway', true)
-    ->add('ca', '/etc/openvpn/ca.crt')
-    ->add('tls-auth', '/etc/openvpn/ta.key 0')
-    ->add('key-direction', 1)
-    ->add('remote-cert-tls', 'server')
-    ->add('auth-user-pass', true)
-    ->add('auth-nocache', true)
-    ->add('nobind', true)
-    ->add('persist-key', true)
-    ->add('persist-tun', true)
-    ->add('comp-lzo', true)
-    ->add('verb', 3)
-    ->add('http-proxy', 'proxy-http.example.com 3128');
+$config->dev             = 'tun';
+$config->remote          = 'vpn.example.com 1194';
+$config->proto           = 'tcp';
+$config->resolvRetry     = 'infinite';
+$config->cipher          = 'AES-256-CB';
+$config->redirectGateway = true;
+$config->keyDirection    = 1;
+$config->remoteCertTls   = 'server';
+$config->authUserPass    = true;
+$config->authNocache     = true;
+$config->nobind          = true;
+$config->persistKey      = true;
+$config->persistTun      = true;
+$config->compLzo         = true;
+$config->verb            = 3;
+$config->httpProxy       = 'proxy-http.example.com 3128';
+
+// Set additional certificates of client
+$config->setCerts([
+    'ca'       => '/etc/openvpn/ca.crt',
+    'tls-auth' => '/etc/openvpn/ta.key 0',
+], true);
 
 // Generate config by options
 echo $config->generate();
@@ -85,9 +214,9 @@ Just a simple usage example:
 
 ```php
 header('Content-Type:text/plain');
-header("Content-Disposition: attachment; filename=client.conf");
-header("Pragma: no-cache");
-header("Expires: 0");
+header('Content-Disposition: attachment; filename=client.conf');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 die($config->generate());
 ```
@@ -95,6 +224,7 @@ die($config->generate());
 # Links
 
 * [OpenVPN parameters](https://openvpn.net/index.php/open-source/documentation/manuals/65-openvpn-20x-manpage.html) - Full list of available parameters what can be used
+* [Laravel VPN Admin](https://github.com/Laravel-VPN-Admin) - Web interface for your VPN server
 * [OpenVPN Admin](https://github.com/Chocobozzz/OpenVPN-Admin) - Web interface for your OpenVPN server
 * [Docker for OpenVPN Admin](https://github.com/EvilFreelancer/docker-openvpn-admin) - Dockerized web panel together with OpenVPN
-* [PHP Openvpn](https://github.com/paranic/openvpn) - Yet another library for generating OpenVPN config files
+* [PHP OpenVPN](https://github.com/paranic/openvpn) - Yet another library for generating OpenVPN config files
