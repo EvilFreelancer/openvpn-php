@@ -46,6 +46,8 @@ use function is_bool;
  * @property string    $auth                Authenticate packets with HMAC using message digest algorithm alg. (The default is SHA1).
  * @property bool|null $authUserPass
  * @property bool|null $authNocache
+ * @property string    $authUserPassVerify  Path to login script
+ * @property bool|null $duplicateCn         You may need this if everyone is using same certificate
  * @property bool|null $persistKey
  * @property bool|null $persistTun
  * @property bool|null $compLzo             Use fast LZO compression — may add up to 1 byte per packet for incompressible data.

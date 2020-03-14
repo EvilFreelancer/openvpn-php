@@ -28,6 +28,8 @@ $config->clientConfigDir      = 'ccd';
 $config->scriptSecurity       = 3;
 $config->usernameAsCommonName = true;
 $config->verifyClientCert     = 'none';
+$config->authUserPassVerify   = 'your_script.sh via-file';
+$config->duplicateCn          = true;
 
 // Set routes which will be used by server
 $config->setRoutes([
