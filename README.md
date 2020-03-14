@@ -93,7 +93,7 @@ More examples [here](examples).
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Config object
-$config = new OpenVPN\Config();
+$config = new \OpenVPN\Config();
 
 // Set server options
 $config->dev                  = 'tun';
@@ -177,9 +177,10 @@ and generate the config:
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Config object
-$config = new OpenVPN\Config(true);
+$config = new \OpenVPN\Config();
 
 // Set client options
+$config->client();
 $config->dev             = 'tun';
 $config->remote          = 'vpn.example.com 1194';
 $config->proto           = 'tcp';
