@@ -126,7 +126,7 @@ class Config implements ConfigInterface, GeneratorInterface
      */
     public function loadCertificates(): void
     {
-        foreach ($this->certs as $cert) {
+        foreach ($this->certs as &$cert) {
             $cert['content'] = rtrim(file_get_contents($cert['path']));
         }
     }
