@@ -26,6 +26,18 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^7.0",
-        "larapack/dd": "^1.1"
+        "larapack/dd": "^1.1",
+        "orchestra/testbench": "^3.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "OpenVPN\\Laravel\\ServiceProvider"
+            ],
+            "aliases": {
+                "OpenVPNConfig": "OpenVPN\\Laravel\\ConfigFacade",
+                "OpenVPNGenerator": "OpenVPN\\Laravel\\GeneratorFacade"
+            }
+        }
     }
 }
