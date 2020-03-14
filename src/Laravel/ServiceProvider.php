@@ -27,11 +27,11 @@ class ServiceProvider extends BaseServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../../configs/openvpn-client.php', 'openvpn-client',
+            __DIR__ . '/../../configs/openvpn-client.php', 'openvpn-client'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/../../configs/openvpn-server.php', 'openvpn-server',
+            __DIR__ . '/../../configs/openvpn-server.php', 'openvpn-server'
         );
 
         $this->app->bind(ConfigWrapper::class);
