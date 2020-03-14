@@ -2,7 +2,6 @@
 [![Build Status](https://travis-ci.org/evilfreelancer/openvpn-php.svg?branch=master)](https://travis-ci.org/EvilFreelancer/openvpn-php)
 [![Total Downloads](https://poser.pugx.org/evilfreelancer/openvpn-php/downloads)](https://packagist.org/packages/evilfreelancer/openvpn-php)
 [![License](https://poser.pugx.org/evilfreelancer/openvpn-php/license)](https://packagist.org/packages/evilfreelancer/openvpn-php)
-[![PHP 7 ready](https://php7ready.timesplinter.ch/EvilFreelancer/openvpn-php/master/badge.svg)](https://travis-ci.org/EvilFreelancer/openvpn-php)
 [![Code Climate](https://codeclimate.com/github/EvilFreelancer/openvpn-php/badges/gpa.svg)](https://codeclimate.com/github/EvilFreelancer/openvpn-php)
 [![Code Coverage](https://scrutinizer-ci.com/g/EvilFreelancer/openvpn-php/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/EvilFreelancer/openvpn-php/?branch=master)
 [![Scrutinizer CQ](https://scrutinizer-ci.com/g/EvilFreelancer/openvpn-php/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/EvilFreelancer/openvpn-php/)
