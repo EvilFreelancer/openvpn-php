@@ -8,8 +8,8 @@ $config = new OpenVPN\Config();
 $config
     ->add('client')
     ->add('dev', 'tun')
-    ->add('proto', 'tcp-client')
-    ->add('port', '1194')
+    ->add('remote', 'vpn.example.com 1194')
+    ->add('proto', 'tcp')
     ->add('resolv-retry', 'infinite')
     ->add('cipher', 'AES-256-CBC')
     ->add('redirect-gateway', true)
