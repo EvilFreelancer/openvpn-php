@@ -1,5 +1,7 @@
 <?php
 
+namespace OpenVPN\Tests;
+
 use OpenVPN\Config;
 use PHPUnit\Framework\TestCase;
 

@@ -3,26 +3,29 @@
 namespace OpenVPN;
 
 use OpenVPN\Interfaces\ConfigInterface;
-use SplFileObject;
+use OpenVPN\Interfaces\ImportInterface;
 use function strlen;
 
-class Import
+class Import implements ImportInterface
 {
     /**
      * Lines of config file
      *
      * @var array
      */
-    private $_lines = [];
+    public $lines = [];
 
     /**
      * Import constructor, can import file on starting
      *
-     * @param string|null $filename
+     * @param string|null $filename  Path to config file
+     * @param bool        $isContent If true, then path mean content of config file
      */
-    public function __construct(string $filename = null)
+    public function __construct(string $filename = null, bool $isContent = false)
     {
-        if (null !== $filename) {
+        if ($isContent) {
+            $this->load($filename);
+        } elseif (null !== $filename) {
             $this->read($filename);
         }
     }
@@ -54,23 +57,36 @@ class Import
      */
     public function read(string $filename): array
     {
-        $lines = ['total' => 0, 'read' => 0];
+        $content = file_get_contents($filename);
+        return $this->load($content);
+    }
+
+    /**
+     * Load content from text of config
+     *
+     * @param string $content Content of config file
+     *
+     * @return array Array with count of total and read lines
+     */
+    public function load(string $content): array
+    {
+        $result = ['total' => 0, 'read' => 0];
 
         // Open file as SPL object
-        $file = new SplFileObject($filename);
+        $lines = explode("\n", $content);
 
         // Read line by line
-        while (!$file->eof()) {
-            $line = $file->fgets();
+        foreach ($lines as $line) {
+            $line = trim($line);
             // Save line only of not empty
             if ($this->isLine($line) && strlen($line) > 1) {
-                $line           = trim(preg_replace('/\s+/', ' ', $line));
-                $this->_lines[] = $line;
-                $lines['read']++;
+                $line          = trim(preg_replace('/\s+/', ' ', $line));
+                $this->lines[] = $line;
+                $result['read']++;
             }
-            $lines['total']++;
+            $result['total']++;
         }
-        return $lines;
+        return $result;
     }
 
     /**
@@ -87,7 +103,7 @@ class Import
                     $config->set($matches[1], $matches[3] ?? true);
                 }
             },
-            $this->_lines
+            $this->lines
         );
         return $config;
     }
