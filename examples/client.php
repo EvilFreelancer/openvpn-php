@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Config object
-$config = new OpenVPN\Config();
+$config = new \OpenVPN\Config();
 
 // Set client options
 $config

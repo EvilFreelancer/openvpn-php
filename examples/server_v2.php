@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Config object
-$config = new OpenVPN\Config();
+$config = new \OpenVPN\Config();
 
 // Set server options
 $config->dev                  = 'tun';
@@ -31,7 +31,7 @@ $config->verifyClientCert     = 'none';
 $config->authUserPassVerify   = 'your_script.sh via-file';
 $config->duplicateCn          = true;
 
-// Set routes which will be used by server
+// Set routes which will be used by server after starting
 $config->setRoutes([
     '10.1.1.0 255.255.255.0',
     '10.1.2.0 255.255.255.0',
@@ -40,16 +40,26 @@ $config->setRoutes([
 
 // Set additional certificates of server
 $config->setCerts([
-    'ca'       => '/etc/openvpn/ca.crt',
-    'cert'     => '/etc/openvpn/server.crt',
-    'key'      => '/etc/openvpn/server.key',
-    'dh'       => '/etc/openvpn/dh4096.crt',
-    'tls-auth' => '/etc/openvpn/ta.key 0',
-]);
+    'ca'   => '/etc/openvpn/keys/ca.crt',
+    'cert' => '/etc/openvpn/keys/issued/server.crt',
+]); // You can embed certificates into config by adding true as second parameter of setCerts method
+
+// Another way for adding certificates
+$config
+    ->setCert('key', '/etc/openvpn/keys/private/server.key')
+    ->setCert('dh', '/etc/openvpn/keys/dh.pem');
 
 // Set pushes which will be passed to client
 $config->setPushes([
+    // Additional routes, which clients will see
+    'route 10.1.2.0 255.255.255.0',
+    'route 10.1.3.0 255.255.255.0',
+    'route 10.1.4.0 255.255.255.0',
+
+    // Replace default gateway, all client's traffic will be routed via VPN
     'redirect-gateway def1',
+
+    // Prepend additional DNS addresses
     'dhcp-option DNS 8.8.8.8',
     'dhcp-option DNS 8.8.4.4',
 ]);

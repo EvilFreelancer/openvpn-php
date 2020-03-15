@@ -25,9 +25,10 @@ $config->httpProxy = 'proxy-http.example.com 3128';
 
 // Set additional certificates of client
 $config->setCerts([
-    'ca'       => '/etc/openvpn/ca.crt',
-    'tls-auth' => '/etc/openvpn/ta.key 0',
-], true);
+    'ca'   => '/etc/openvpn/keys/ca.crt',
+    'cert' => '/etc/openvpn/keys/issued/client1.crt',
+    'key'  => '/etc/openvpn/keys/private/client1.key',
+], true); // true mean embed certificates into config, false by default
 
 // Generate config by options
 echo $config->generate();

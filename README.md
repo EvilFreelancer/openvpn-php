@@ -45,22 +45,23 @@ $config->httpProxy = 'proxy-http.example.com 3128';
 
 // Set additional certificates of client
 $config->setCerts([
-    'ca'       => '/etc/openvpn/ca.crt',
-    'tls-auth' => '/etc/openvpn/ta.key 0',
-], true);
+    'ca'   => '/etc/openvpn/keys/ca.crt',
+    'cert' => '/etc/openvpn/keys/issued/client1.crt',
+    'key'  => '/etc/openvpn/keys/private/client1.key',
+], true); // true mean embed certificates into config, false by default
 
 // Generate config by options
 echo $config->generate();
 ```
 
-It will read configuration from `configs` folder (if it was published of course), then merge your parameters to this array and in results
-you will see then `\OpenVPN\Config` object.
+It will read `openvpn-client.php` configuration from `configs` folder (if it was published of course), then merge your parameters to this
+array and in results you will see the `\OpenVPN\Config` object.
 
 ### Laravel installation
 
 Install the package via Composer:
 
-    composer require evilfreelancer/routeros-api-php
+    composer require evilfreelancer/openvpn-php
 
 By default the package will automatically register its service provider, but
 if you are a happy owner of Laravel version less than 5.5, then in a project, which is using your package
@@ -119,7 +120,7 @@ $config->scriptSecurity       = 3;
 $config->usernameAsCommonName = true;
 $config->verifyClientCert     = 'none';
 
-// Set routes which will be used by server
+// Set routes which will be used by server after starting
 $config->setRoutes([
     '10.1.1.0 255.255.255.0',
     '10.1.2.0 255.255.255.0',
@@ -128,17 +129,27 @@ $config->setRoutes([
 
 // Set additional certificates of server
 $config->setCerts([
-    'ca'       => '/etc/openvpn/ca.crt',
-    'cert'     => '/etc/openvpn/server.crt',
-    'key'      => '/etc/openvpn/server.key',
-    'dh'       => '/etc/openvpn/dh4096.crt',
-    'tls-auth' => '/etc/openvpn/ta.key 0',
-]);
+    'ca'   => '/etc/openvpn/keys/ca.crt',
+    'cert' => '/etc/openvpn/keys/issued/server.crt',
+]); // You can embed certificates into config by adding true as second parameter of setCerts method
+
+// Another way for adding certificates
+$config
+    ->setCert('key', '/etc/openvpn/keys/private/server.key')
+    ->setCert('dh', '/etc/openvpn/keys/dh.pem');
 
 // Set pushes which will be passed to client
 $config->setPushes([
+    // Additional routes, which clients will see
+    'route 10.1.2.0 255.255.255.0',
+    'route 10.1.3.0 255.255.255.0',
+    'route 10.1.4.0 255.255.255.0',
+
+    // Replace default gateway, all client's traffic will be routed via VPN
     'redirect-gateway def1',
-    'dhcp-option DNS 8.8.8.8',
+
+    // Prepend additional DNS addresses    
+    'dhcp-option DNS 8.8.8.8', 
     'dhcp-option DNS 8.8.4.4',
 ]);
 
@@ -200,9 +211,10 @@ $config->httpProxy       = 'proxy-http.example.com 3128';
 
 // Set additional certificates of client
 $config->setCerts([
-    'ca'       => '/etc/openvpn/ca.crt',
-    'tls-auth' => '/etc/openvpn/ta.key 0',
-], true);
+    'ca'   => '/etc/openvpn/keys/ca.crt',
+    'cert' => '/etc/openvpn/keys/issued/client1.crt',
+    'key'  => '/etc/openvpn/keys/private/client1.key',
+], true); // true mean embed certificates into config, false by default
 
 // Generate config by options
 echo $config->generate();
@@ -214,7 +226,7 @@ Just a simple usage example:
 
 ```php
 header('Content-Type:text/plain');
-header('Content-Disposition: attachment; filename=client.conf');
+header('Content-Disposition: attachment; filename=client.ovpn');
 header('Pragma: no-cache');
 header('Expires: 0');
 

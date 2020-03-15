@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Config object
-$config = new OpenVPN\Config();
+$config = new \OpenVPN\Config();
 
 // Set client options
 $config->client();
@@ -25,8 +25,9 @@ $config->httpProxy       = 'proxy-http.example.com 3128';
 
 // Set additional certificates of client
 $config->setCerts([
-    'ca'       => '/etc/openvpn/ca.crt',
-    'tls-auth' => '/etc/openvpn/ta.key 0',
+    'ca'   => '/etc/openvpn/keys/ca.crt',
+    'cert' => '/etc/openvpn/keys/issued/client1.crt',
+    'key'  => '/etc/openvpn/keys/private/client1.key',
 ], true);
 
 // Generate config by options
