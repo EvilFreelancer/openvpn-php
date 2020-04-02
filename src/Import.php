@@ -65,15 +65,19 @@ class Import implements ImportInterface
      * Load content from text of config
      *
      * @param string $content Content of config file
+     * @param string $type    Type of loaded content: raw (default), json
      *
      * @return array Array with count of total and read lines
      */
-    public function load(string $content): array
+    public function load(string $content, string $type = 'raw'): array
     {
         $result = ['total' => 0, 'read' => 0];
 
-        // Open file as SPL object
-        $lines = explode("\n", $content);
+        if ($type === 'raw') {
+            $lines = explode("\n", $content);
+        } elseif ($type === 'json') {
+            $lines = json_decode($json, false);
+        }
 
         // Read line by line
         foreach ($lines as $line) {

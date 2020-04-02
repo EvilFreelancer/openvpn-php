@@ -32,7 +32,7 @@ $config->authUserPassVerify   = 'your_script.sh via-file';
 $config->duplicateCn          = true;
 
 // Set routes which will be used by server after starting
-$this->config->setRoutes([
+$config->setRoutes([
     '10.1.1.0 255.255.255.0',
     '10.1.2.0 255.255.255.0',
     '10.1.3.0 255.255.255.0',
@@ -67,4 +67,4 @@ $config->setPushes([
 ]);
 
 // Generate config by options
-echo $config->generate();
+echo $config->generate('json');

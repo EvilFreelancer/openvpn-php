@@ -30,14 +30,56 @@ class Generator implements GeneratorInterface
     }
 
     /**
-     * Generate config by parameters in memory
+     * Generate config in JSON format
      *
      * @return string
      */
-    public function generate(): string
+    private function generateJson(): string
     {
         // Init the variable
-        $config = '';
+        $config = [];
+
+        // Basic parameters first
+        foreach ($this->config->getParameters() as $key => $value) {
+            $config[] = $key . ($value !== '' ? ' ' . $value : '');
+        }
+
+        // Get all what need for normal work
+        $pushes = $this->config->getPushes();
+        $routes = $this->config->getRoutes();
+        $certs  = $this->config->getCerts();
+
+        // If we have routes or pushes in lists then generate it
+        if (count($pushes) || count($routes)) {
+            foreach ($routes as $route) {
+                $config[] = 'route ' . $route;
+            }
+            foreach ($pushes as $push) {
+                $config[] = 'push "' . $push . '"';
+            }
+        }
+
+        // Certs should be below everything, due embedded keys and certificates
+        if (count($certs) > 0) {
+            foreach ($this->config->getCerts() as $key => $value) {
+                $config[] .= isset($value['content'])
+                    ? "<$key>\n{$value['content']}\n</$key>"
+                    : "$key {$value['path']}";
+            }
+        }
+
+        return json_encode($config, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * Generate config in RAW format
+     *
+     * @return string
+     */
+    private function generateRaw(): string
+    {
+        // Init the variable
+        $config = null;
 
         // Basic parameters first
         foreach ($this->config->getParameters() as $key => $value) {
@@ -71,5 +113,25 @@ class Generator implements GeneratorInterface
         }
 
         return $config;
+    }
+
+    /**
+     * Generate config by parameters in memory
+     *
+     * @param string $type Type of generated config: raw (default), json
+     *
+     * @return string|null
+     */
+    public function generate(string $type = 'raw'): ?string
+    {
+        if ($type === 'raw') {
+            return $this->generateRaw();
+        }
+
+        if ($type === 'json') {
+            return $this->generateJson();
+        }
+
+        return null;
     }
 }

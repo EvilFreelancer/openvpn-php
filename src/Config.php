@@ -309,12 +309,14 @@ class Config implements ConfigInterface, GeneratorInterface
     /**
      * Generate config by parameters in memory
      *
-     * @return string
+     * @param string $type Type of generated config: raw (default), json
+     *
+     * @return string|null
      */
-    public function generate(): string
+    public function generate(string $type = 'raw'): ?string
     {
         $generator = new Generator($this);
-        return $generator->generate();
+        return $generator->generate($type);
     }
 
     /**
