@@ -20,6 +20,11 @@
             "OpenVPN\\": "./src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "OpenVPN\\Tests\\": "./tests/"
+        }
+    },
     "require": {
         "php": ">=7.1",
         "ext-mbstring": "*",
