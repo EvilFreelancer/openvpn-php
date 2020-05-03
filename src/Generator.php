@@ -30,11 +30,11 @@ class Generator implements GeneratorInterface
     }
 
     /**
-     * Generate config in JSON format
+     * Generate config in array format
      *
-     * @return string
+     * @return array
      */
-    private function generateJson(): string
+    private function generateArray(): array
     {
         // Init the variable
         $config = [];
@@ -68,6 +68,17 @@ class Generator implements GeneratorInterface
             }
         }
 
+        return $config;
+    }
+
+    /**
+     * Generate config in JSON format
+     *
+     * @return string
+     */
+    private function generateJson(): string
+    {
+        $config = $this->generateArray();
         return json_encode($config, JSON_PRETTY_PRINT);
     }
 
@@ -78,51 +89,18 @@ class Generator implements GeneratorInterface
      */
     private function generateRaw(): string
     {
-        // Init the variable
-        $config = null;
-
-        // Basic parameters first
-        foreach ($this->config->getParameters() as $key => $value) {
-            $config .= $key . ($value !== '' ? ' ' . $value : '') . "\n";
-        }
-
-        // Get all what need for normal work
-        $pushes = $this->config->getPushes();
-        $routes = $this->config->getRoutes();
-        $certs  = $this->config->getCerts();
-
-        // If we have routes or pushes in lists then generate it
-        if (count($pushes) || count($routes)) {
-            $config .= "\n### Networking\n";
-            foreach ($routes as $route) {
-                $config .= 'route ' . $route . "\n";
-            }
-            foreach ($pushes as $push) {
-                $config .= 'push "' . $push . "\"\n";
-            }
-        }
-
-        // Certs should be below everything, due embedded keys and certificates
-        if (count($certs) > 0) {
-            $config .= "\n### Certificates\n";
-            foreach ($this->config->getCerts() as $key => $value) {
-                $config .= isset($value['content'])
-                    ? "<$key>\n{$value['content']}\n</$key>\n"
-                    : "$key {$value['path']}\n";
-            }
-        }
-
-        return $config;
+        $config = $this->generateArray();
+        return implode(PHP_EOL, $config);
     }
 
     /**
      * Generate config by parameters in memory
      *
-     * @param string $type Type of generated config: raw (default), json
+     * @param string $type Type of generated config: raw (default), json, array
      *
-     * @return string|null
+     * @return array|string|null
      */
-    public function generate(string $type = 'raw'): ?string
+    public function generate(string $type = 'raw')
     {
         if ($type === 'raw') {
             return $this->generateRaw();
@@ -130,6 +108,10 @@ class Generator implements GeneratorInterface
 
         if ($type === 'json') {
             return $this->generateJson();
+        }
+
+        if ($type === 'array') {
+            return $this->generateArray();
         }
 
         return null;

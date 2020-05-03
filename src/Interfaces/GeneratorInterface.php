@@ -9,7 +9,7 @@ interface GeneratorInterface
      *
      * @param string $type Type of generated config: raw (default), json
      *
-     * @return string|null
+     * @return array|string|null
      */
-    public function generate(string $type = 'raw'): ?string;
+    public function generate(string $type = 'raw');
 }
