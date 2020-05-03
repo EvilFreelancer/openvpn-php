@@ -9,7 +9,7 @@ class ConfigTest extends TestCase
 {
     private $class;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->class = new Config();
     }
@@ -32,10 +32,10 @@ class ConfigTest extends TestCase
     {
         $this->class->setCert('ca', '/etc/openvpn/ca.crt');
         $this->class->setCert('cert', '/etc/openvpn/server.crt');
-        $this->assertEquals(count($this->class->getCerts()), 2);
+        $this->assertCount(2, $this->class->getCerts());
 
         $this->class->unsetCert('ca');
-        $this->assertEquals(count($this->class->getCerts()), 1);
+        $this->assertCount(1, $this->class->getCerts());
 
         $this->assertTrue(isset($this->class->getCerts()['cert']));
     }
@@ -49,8 +49,7 @@ class ConfigTest extends TestCase
         $this->class->setCert('tls-auth', '/etc/openvpn/ta.key');
         $this->class->unsetCert('ca');
         $this->class->unsetCert('dh');
-        $this->assertEquals(count($this->class->getCerts()), 3);
-
+        $this->assertCount(3, $this->class->getCerts());
     }
 
 }
