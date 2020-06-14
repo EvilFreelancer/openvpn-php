@@ -45,17 +45,21 @@ class Generator implements GeneratorInterface
         }
 
         // Get all what need for normal work
-        $pushes = $this->config->getPushes();
-        $routes = $this->config->getRoutes();
-        $certs  = $this->config->getCerts();
+        $pushes  = $this->config->getPushes();
+        $routes  = $this->config->getRoutes();
+        $remotes = $this->config->getRemotes();
+        $certs   = $this->config->getCerts();
 
         // If we have routes or pushes in lists then generate it
-        if (count($pushes) || count($routes)) {
+        if (count($pushes) || count($routes) || count($remotes)) {
+            foreach ($pushes as $push) {
+                $config[] = 'push "' . $push . '"';
+            }
             foreach ($routes as $route) {
                 $config[] = 'route ' . $route;
             }
-            foreach ($pushes as $push) {
-                $config[] = 'push "' . $push . '"';
+            foreach ($remotes as $remote) {
+                $config[] = 'remote ' . $remote;
             }
         }
 

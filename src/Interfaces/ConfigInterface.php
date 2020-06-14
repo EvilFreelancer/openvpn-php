@@ -91,6 +91,24 @@ interface ConfigInterface
     public function unsetRoute(string $line): ConfigInterface;
 
     /**
+     * Append new push into the array
+     *
+     * @param string $line String with line which must be added as remote
+     *
+     * @return \OpenVPN\Interfaces\ConfigInterface
+     */
+    public function setRemote(string $line): ConfigInterface;
+
+    /**
+     * Remove remote line from remotes array
+     *
+     * @param string $line String with line which must be added as remote
+     *
+     * @return \OpenVPN\Interfaces\ConfigInterface
+     */
+    public function unsetRemote(string $line): ConfigInterface;
+
+    /**
      * Add some new parameter to the list of parameters
      *
      * @param string           $name  Name of parameter
@@ -139,6 +157,15 @@ interface ConfigInterface
     public function setRoutes(array $routes): ConfigInterface;
 
     /**
+     * Set scope of unique remotes
+     *
+     * @param \OpenVPN\Types\Remote[] $remotes
+     *
+     * @return \OpenVPN\Interfaces\ConfigInterface
+     */
+    public function setRemotes(array $remotes): ConfigInterface;
+
+    /**
      * Set scope of unique parameters
      *
      * @param \OpenVPN\Types\Parameter[] $parameters
@@ -167,6 +194,13 @@ interface ConfigInterface
      * @return array
      */
     public function getRoutes(): array;
+
+    /**
+     * Export array of all remotes
+     *
+     * @return array
+     */
+    public function getRemotes(): array;
 
     /**
      * Export array of all parameters

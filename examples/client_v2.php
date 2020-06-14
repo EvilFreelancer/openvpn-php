@@ -7,7 +7,6 @@ $config = new \OpenVPN\Config();
 // Set client options
 $config->client();
 $config->dev             = 'tun';
-$config->remote          = 'vpn.example.com 1194';
 $config->proto           = 'tcp';
 $config->resolvRetry     = 'infinite';
 $config->cipher          = 'AES-256-CB';
@@ -23,12 +22,17 @@ $config->compLzo         = true;
 $config->verb            = 3;
 $config->httpProxy       = 'proxy-http.example.com 3128';
 
-// Set additional certificates of client
-$config->setCerts([
-    'ca'   => '/etc/openvpn/keys/ca.crt',
-    'cert' => '/etc/openvpn/keys/issued/client1.crt',
-    'key'  => '/etc/openvpn/keys/private/client1.key',
-], true);
+$config->setRemotes([
+    'vpn1.example.com 1194',
+    'vpn2.example.com 11194'
+]);
+
+//// Set additional certificates of client
+//$config->setCerts([
+//    'ca'   => '/etc/openvpn/keys/ca.crt',
+//    'cert' => '/etc/openvpn/keys/issued/client1.crt',
+//    'key'  => '/etc/openvpn/keys/private/client1.key',
+//], true);
 
 // Generate config by options
-echo $config->generate();
+echo $config->generate() . PHP_EOL;

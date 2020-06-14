@@ -93,6 +93,13 @@ class Config implements ConfigInterface, GeneratorInterface
     private $pushes = [];
 
     /**
+     * List of lines which can be used as remotes
+     *
+     * @var array
+     */
+    private $remotes = [];
+
+    /**
      * All parameters added via addParam method
      *
      * @var array
@@ -241,6 +248,32 @@ class Config implements ConfigInterface, GeneratorInterface
     }
 
     /**
+     * Append new push into the array
+     *
+     * @param string $line String with line which must be added as remote
+     *
+     * @return \OpenVPN\Interfaces\ConfigInterface
+     */
+    public function setRemote(string $line): ConfigInterface
+    {
+        $this->remotes[] = trim($line, '"');
+        return $this;
+    }
+
+    /**
+     * Remove remote line from remotes array
+     *
+     * @param string $line String with line which must be added as remote
+     *
+     * @return \OpenVPN\Interfaces\ConfigInterface
+     */
+    public function unsetRemote(string $line): ConfigInterface
+    {
+        unset($this->remotes[$line]);
+        return $this;
+    }
+
+    /**
      * Alias to set
      *
      * @deprecated TODO: Delete in future releases
@@ -266,6 +299,11 @@ class Config implements ConfigInterface, GeneratorInterface
         // Check if key is certificate or push, or classic parameter
         if (in_array($name, self::ALLOWED_TYPES_OF_CERTS, true)) {
             return $this->setCert($name, $value);
+        }
+
+        // If is push then use add push method
+        if ($name === 'remote') {
+            return $this->setRemote($value);
         }
 
         // If is push then use add push method
@@ -336,6 +374,11 @@ class Config implements ConfigInterface, GeneratorInterface
             throw new RuntimeException("Not possible to remove route, use 'unsetRoute' instead");
         }
 
+        // Inform about deleting route
+        if ($name === 'remote') {
+            throw new RuntimeException("Not possible to remove remote, use 'unsetRemote' instead");
+        }
+
         return isset($this->parameters[$name]);
     }
 
@@ -377,6 +420,11 @@ class Config implements ConfigInterface, GeneratorInterface
         // Inform about deleting route
         if ($name === 'route') {
             throw new RuntimeException("Not possible to remove route, use 'unsetRoute' instead");
+        }
+
+        // Inform about deleting route
+        if ($name === 'remote') {
+            throw new RuntimeException("Not possible to remove remote, use 'unsetRemote' instead");
         }
 
         // Check if key is certificate or push, or classic parameter
@@ -466,6 +514,22 @@ class Config implements ConfigInterface, GeneratorInterface
     }
 
     /**
+     * Set scope of unique remotes
+     *
+     * @param \OpenVPN\Types\Remote[] $remotes
+     *
+     * @return \OpenVPN\Interfaces\ConfigInterface
+     */
+    public function setRemotes(array $remotes): ConfigInterface
+    {
+        foreach ($remotes as $remote) {
+            $this->setRemote($remote);
+        }
+
+        return $this;
+    }
+
+    /**
      * Set scope of unique parameters
      *
      * @param \OpenVPN\Types\Parameter[] $parameters
@@ -509,6 +573,16 @@ class Config implements ConfigInterface, GeneratorInterface
     public function getRoutes(): array
     {
         return $this->routes;
+    }
+
+    /**
+     * Export array of all remotes
+     *
+     * @return array
+     */
+    public function getRemotes(): array
+    {
+        return $this->remotes;
     }
 
     /**
