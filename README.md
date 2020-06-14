@@ -43,6 +43,12 @@ $config->set('nobind');
 $config->remote    = 'vpn.example.com 1194';
 $config->httpProxy = 'proxy-http.example.com 3128';
 
+// Set multiple remote servers
+$config->setRemotes([
+    'vpn1.example.com 1194',
+    'vpn2.example.com 11194'
+]);
+
 // Set additional certificates of client
 $config->setCerts([
     'ca'   => '/etc/openvpn/keys/ca.crt',
@@ -63,7 +69,7 @@ Install the package via Composer:
 
     composer require evilfreelancer/openvpn-php
 
-By default the package will automatically register its service provider, but
+By default, the package will automatically register its service provider, but
 if you are a happy owner of Laravel version less than 5.5, then in a project, which is using your package
 (after composer require is done, of course), add into`providers` block of your `config/app.php`:
 
@@ -193,7 +199,6 @@ $config = new \OpenVPN\Config();
 // Set client options
 $config->client();
 $config->dev             = 'tun';
-$config->remote          = 'vpn.example.com 1194';
 $config->proto           = 'tcp';
 $config->resolvRetry     = 'infinite';
 $config->cipher          = 'AES-256-CB';
@@ -208,6 +213,18 @@ $config->persistTun      = true;
 $config->compLzo         = true;
 $config->verb            = 3;
 $config->httpProxy       = 'proxy-http.example.com 3128';
+
+// Set multiple remote servers
+$config->setRemotes([
+    'vpn1.example.com 1194',
+    'vpn2.example.com 11194'
+]);
+
+// Set single remote
+$config->setRemote('vpn1.example.com 1194');
+
+// Or set remote server as parameter of object
+$config->remote = 'vpn.example.com 1194';
 
 // Set additional certificates of client
 $config->setCerts([
