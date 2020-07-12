@@ -249,7 +249,31 @@ Publish the `openvpn-server.php` and `openvpn-client.php` configuration files:
 php artisan vendor:publish --provider="OpenVPN\Laravel\ServiceProvider"
 ```
 
-# Links
+## Testing
+
+Before you begin need to install `dev` dependencies
+
+```shell script
+composer install --dev
+```
+
+Then run tests
+
+```shell script
+composer test
+
+# which same as
+composer test:lint
+composer test:unit
+```
+
+or
+
+```shell script
+./vendor/bin/phpunit
+```
+
+## Links
 
 * [OpenVPN parameters](https://openvpn.net/index.php/open-source/documentation/manuals/65-openvpn-20x-manpage.html) - Full list of available parameters what can be used
 * [Laravel VPN Admin](https://github.com/Laravel-VPN-Admin) - Web interface for your VPN server
