@@ -40,9 +40,11 @@
         "phpunit/phpunit": "^8.0",
         "larapack/dd": "^1.1",
         "friendsofphp/php-cs-fixer": "^2.16",
-        "larapack/dd": "^1.1",
         "limedeck/phpunit-detailed-printer": "^5.0",
         "orchestra/testbench": "^4.0|^5.0"
+    },
+    "suggest": {
+        "evilfreelancer/easyrsa-php": "1.0.0"
     },
     "config": {
         "sort-packages": true,
