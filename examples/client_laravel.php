@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Config og client object
-$config = \OpenVPN::getClient([
+$config = \OpenVPN::client([
     'dev'              => 'tun',
     'proto'            => 'tcp',
     'resolvRetry'      => 'infinite',
