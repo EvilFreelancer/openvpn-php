@@ -234,8 +234,10 @@ array and in results you will see the `\OpenVPN\Config` object.
 
 * `\OpenVPN::server(array $parameters = [])` - Will return `\OpenVPN\Config` object with settings loaded from `openvpn-server.php`
 * `\OpenVPN::client(array $parameters = [])` - Will return `\OpenVPN\Config` object with settings loaded from `openvpn-client.php`
-* `\OpenVPN::importer(string $filename = null, bool $isContent = false)` - Will return `\OpenVPN\Import` object, with help of this object you may read OpenVPN configuration of your server or client
-* `\OpenVPN::generator(\OpenVPN\Config $config)` - Will return `\OpenVPN\Genrator` object with `->generate()` method, which may used for render OpenVPN configuration by details from configuration 
+* `\OpenVPN::importer(string $filename = null, bool $isContent = false)` - Will return `\OpenVPN\Import` object, with help of this object
+you may read OpenVPN configuration of your server or client
+* `\OpenVPN::generator(\OpenVPN\Config $config)` - Will return `\OpenVPN\Generator` object with `->generate()` method, which may used
+for render OpenVPN configuration by parameters from Config object 
 
 ### Installation
 
