@@ -49,34 +49,29 @@ class Import implements ImportInterface
     }
 
     /**
-     * Read configuration file line by line
-     *
-     * @param string $filename
-     *
-     * @return array Array with count of total and read lines
+     * {@inheritDoc}
      */
     public function read(string $filename): array
     {
         $content = file_get_contents($filename);
+
         return $this->load($content);
     }
 
     /**
-     * Load content from text of config
-     *
-     * @param string $content Content of config file
-     * @param string $type    Type of loaded content: raw (default), json
-     *
-     * @return array Array with count of total and read lines
+     * {@inheritDoc}
      */
-    public function load(string $content, string $type = 'raw'): array
+    public function load($content, string $type = 'raw'): array
     {
         $result = ['total' => 0, 'read' => 0];
+        $lines  = [];
 
-        if ($type === 'raw') {
+        if (is_array($content)) {
+            $lines = $content;
+        } elseif ($type === 'raw') {
             $lines = explode("\n", $content);
         } elseif ($type === 'json') {
-            $lines = json_decode($json, false);
+            $lines = json_decode($content, false);
         }
 
         // Read line by line
@@ -90,17 +85,17 @@ class Import implements ImportInterface
             }
             $result['total']++;
         }
+
         return $result;
     }
 
     /**
-     * Parse readed lines
-     *
-     * @return \OpenVPN\Interfaces\ConfigInterface
+     * {@inheritDoc}
      */
     public function parse(): ConfigInterface
     {
         $config = new Config();
+
         array_map(
             static function ($line) use ($config) {
                 if (preg_match('/^(\S+)( (.*))?/', $line, $matches)) {
@@ -109,6 +104,7 @@ class Import implements ImportInterface
             },
             $this->lines
         );
+
         return $config;
     }
 }

@@ -9,8 +9,7 @@ use function count;
 /**
  * Class Generator
  *
- * @package OpenVPN
- * @since   1.0.0
+ * @since 1.0.0
  */
 class Generator implements GeneratorInterface
 {
@@ -83,6 +82,7 @@ class Generator implements GeneratorInterface
     private function generateJson(): string
     {
         $config = $this->generateArray();
+
         return json_encode($config, JSON_PRETTY_PRINT);
     }
 
@@ -94,6 +94,7 @@ class Generator implements GeneratorInterface
     private function generateRaw(): string
     {
         $config = $this->generateArray();
+
         return implode(PHP_EOL, $config);
     }
 

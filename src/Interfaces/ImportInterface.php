@@ -11,7 +11,7 @@ namespace OpenVPN\Interfaces;
 interface ImportInterface
 {
     /**
-     * Parse readed lines
+     * Parse lines which was read fron file
      *
      * @return \OpenVPN\Interfaces\ConfigInterface
      */
@@ -29,10 +29,10 @@ interface ImportInterface
     /**
      * Load content from text of config
      *
-     * @param string $content Content of config file
-     * @param string $type    Type of loaded content: raw (default), json
+     * @param string|array $content Content of config file, if array then will be selected array parser
+     * @param string       $type    Type of loaded content: raw (default), json
      *
      * @return array Array with count of total and read lines
      */
-    public function load(string $content, string $type = 'raw'): array;
+    public function load($content, string $type = 'raw'): array;
 }

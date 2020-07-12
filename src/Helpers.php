@@ -42,5 +42,4 @@ class Helpers
         }
         return implode('-', $result);
     }
-
 }
