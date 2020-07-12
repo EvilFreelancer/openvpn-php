@@ -8,83 +8,11 @@
 
 # OpenVPN config manager
 
-OpenVPN configuration generator/importer written on PHP7.
+OpenVPN configuration manager written on PHP.
 
     composer require evilfreelancer/openvpn-php
 
-## Laravel framework support
-
-This library is optimized for usage as normal Laravel package, all functional is available via `\OpenVPN` facade,
-for access to (for example) client object you need:
-
-```php
-// Config og client object
-$config = \OpenVPN::getClient([
-    'dev'              => 'tun',
-    'proto'            => 'tcp',
-    'resolv-retry'     => 'infinite',
-    'cipher'           => 'AES-256-CB',
-    'redirect-gateway' => true,
-    'key-direction'    => 1,
-    'remote-cert-tls'  => 'server',
-    'auth-user-pass'   => true,
-    'auth-nocache'     => true,
-    'persist-key'      => true,
-    'persist-tun'      => true,
-    'comp-lzo'         => true,
-    'verb'             => 3,
-]);
-
-// Another way for change values
-$config->set('verb', 3);
-$config->set('nobind');
-
-// Yet another way for change values via magic methods
-$config->remote    = 'vpn.example.com 1194';
-$config->httpProxy = 'proxy-http.example.com 3128';
-
-// Set multiple remote servers
-$config->setRemotes([
-    'vpn1.example.com 1194',
-    'vpn2.example.com 11194'
-]);
-
-// Set additional certificates of client
-$config->setCerts([
-    'ca'   => '/etc/openvpn/keys/ca.crt',
-    'cert' => '/etc/openvpn/keys/issued/client1.crt',
-    'key'  => '/etc/openvpn/keys/private/client1.key',
-], true); // true mean embed certificates into config, false by default
-
-// Generate config by options
-echo $config->generate();
-```
-
-It will read `openvpn-client.php` configuration from `configs` folder (if it was published of course), then merge your parameters to this
-array and in results you will see the `\OpenVPN\Config` object.
-
-### Laravel installation
-
-Install the package via Composer:
-
-    composer require evilfreelancer/openvpn-php
-
-By default, the package will automatically register its service provider, but
-if you are a happy owner of Laravel version less than 5.5, then in a project, which is using your package
-(after composer require is done, of course), add into`providers` block of your `config/app.php`:
-
-```php
-'providers' => [
-    // ...
-    OpenVPN\Laravel\ServiceProvider::class,
-],
-```
-
-Optionally, publish the configuration files if you want to change any defaults:
-
-    php artisan vendor:publish --provider="OpenVPN\\Laravel\\ServiceProvider"
-
-It will create two files in your `configs` folder: `openvpn-client.php` and `openvpn-server.php`.
+By the way, OpenVPN library support Laravel framework, details [here](#laravel-framework-support).
 
 ## How to use
 
@@ -96,7 +24,6 @@ More examples [here](examples).
 ### Write new config in OOP style
 
 ```php
-<?php
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Config object
@@ -165,8 +92,8 @@ echo $config->generate();
 
 ### Import existing OpenVPN config
 
-For example you have `server.conf` to import this file you need create
-`\OpenVPN\Import` object and specify name of your config file.
+For example, you have `server.conf`, to import this file you need create
+`\OpenVPN\Import` object and specify a name of your config file.
 
 ```php
 <?php
@@ -174,6 +101,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 // Import OpenVPN config file
 $import = new \OpenVPN\Import('server.conf');
+
 // or (classic way)
 $import = new \OpenVPN\Import();
 $import->read('server.conf');
@@ -231,7 +159,7 @@ $config->setCerts([
     'ca'   => '/etc/openvpn/keys/ca.crt',
     'cert' => '/etc/openvpn/keys/issued/client1.crt',
     'key'  => '/etc/openvpn/keys/private/client1.key',
-], true); // true mean embed certificates into config, false by default
+], true); // true - mean embed certificates into config, false by default
 
 // Generate config by options
 echo $config->generate();
@@ -247,7 +175,76 @@ header('Content-Disposition: attachment; filename=client.ovpn');
 header('Pragma: no-cache');
 header('Expires: 0');
 
-die($config->generate());
+echo $config->generate();
+die();
+```
+
+## Laravel framework support
+
+This library is optimized for usage as normal Laravel package, all functional is available via `\OpenVPN` facade,
+for access to (for example) client object you need:
+
+```php
+// Config og client object
+$config = \OpenVPN::client([
+    'dev'              => 'tun',
+    'proto'            => 'tcp',
+    'resolv-retry'     => 'infinite',
+    'cipher'           => 'AES-256-CB',
+    'redirect-gateway' => true,
+    'key-direction'    => 1,
+    'remote-cert-tls'  => 'server',
+    'auth-user-pass'   => true,
+    'auth-nocache'     => true,
+    'persist-key'      => true,
+    'persist-tun'      => true,
+    'comp-lzo'         => true,
+    'verb'             => 3,
+]);
+
+// Another way for change values
+$config->set('verb', 3);
+$config->set('nobind');
+
+// Yet another way for change values via magic methods
+$config->remote    = 'vpn.example.com 1194';
+$config->httpProxy = 'proxy-http.example.com 3128';
+
+// Set multiple remote servers
+$config->setRemotes([
+    'vpn1.example.com 1194',
+    'vpn2.example.com 11194'
+]);
+
+// Set additional certificates of client
+$config->setCerts([
+    'ca'   => '/etc/openvpn/keys/ca.crt',
+    'cert' => '/etc/openvpn/keys/issued/client1.crt',
+    'key'  => '/etc/openvpn/keys/private/client1.key',
+], true); // true mean embed certificates into config, false by default
+
+// Generate config by options
+echo $config->generate();
+```
+
+It will read `openvpn-client.php` configuration from `config` folder (if it was published of course), then merge your parameters to this
+array and in results you will see the `\OpenVPN\Config` object.
+
+### List of available methods
+
+* `\OpenVPN::server(array $parameters = [])` - Will return `\OpenVPN\Config` object with settings loaded from `openvpn-server.php`
+* `\OpenVPN::client(array $parameters = [])` - Will return `\OpenVPN\Config` object with settings loaded from `openvpn-client.php`
+* `\OpenVPN::importer(string $filename = null, bool $isContent = false)` - Will return `\OpenVPN\Import` object, with help of this object you may read OpenVPN configuration of your server or client
+* `\OpenVPN::generator(\OpenVPN\Config $config)` - Will return `\OpenVPN\Genrator` object with `->generate()` method, which may used for render OpenVPN configuration by details from configuration 
+
+### Installation
+
+The package's service provider will automatically register its service provider.
+
+Publish the `openvpn-server.php` and `openvpn-client.php` configuration files:
+
+```sh
+php artisan vendor:publish --provider="OpenVPN\Laravel\ServiceProvider"
 ```
 
 # Links
