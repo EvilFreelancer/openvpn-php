@@ -72,6 +72,19 @@ use function is_bool;
 class Config implements ConfigInterface, GeneratorInterface
 {
     /**
+     * List of types of certs, for validation
+     */
+    public const ALLOWED_TYPES_OF_CERTS = [
+        'ca',
+        'cert',
+        'key',
+        'dh',
+        'tls-auth',
+        'secret',
+        'pkcs12'
+    ];
+
+    /**
      * Array with all certificates
      *
      * @var array
@@ -139,16 +152,6 @@ class Config implements ConfigInterface, GeneratorInterface
     }
 
     /**
-     * Alias to setCert
-     *
-     * @deprecated TODO: Delete in future releases
-     */
-    public function addCert(string $type, string $pathOrContent, bool $isContent = false): ConfigInterface
-    {
-        return $this->setCert($type, $pathOrContent, $isContent);
-    }
-
-    /**
      * Add new cert into the configuration
      *
      * @param string    $type      Type of certificate [ca, cert, key, dh, tls-auth]
@@ -167,6 +170,7 @@ class Config implements ConfigInterface, GeneratorInterface
         } else {
             $this->certs[$type]['path'] = $path;
         }
+
         return $this;
     }
 
@@ -182,17 +186,8 @@ class Config implements ConfigInterface, GeneratorInterface
     {
         $type = mb_strtolower($type);
         Helpers::isCertAllowed($type);
-        return $this->certs[$type] ?? [];
-    }
 
-    /**
-     * Alias to setPush
-     *
-     * @deprecated TODO: Delete in future releases
-     */
-    public function addPush(string $line): ConfigInterface
-    {
-        return $this->setPush($line);
+        return $this->certs[$type] ?? [];
     }
 
     /**
@@ -205,6 +200,7 @@ class Config implements ConfigInterface, GeneratorInterface
     public function setPush(string $line): ConfigInterface
     {
         $this->pushes[] = trim($line, '"');
+
         return $this;
     }
 
@@ -218,6 +214,7 @@ class Config implements ConfigInterface, GeneratorInterface
     public function unsetPush(string $line): ConfigInterface
     {
         unset($this->pushes[$line]);
+
         return $this;
     }
 
@@ -231,6 +228,7 @@ class Config implements ConfigInterface, GeneratorInterface
     public function setRoute(string $line): ConfigInterface
     {
         $this->routes[] = trim($line, '"');
+
         return $this;
     }
 
@@ -244,6 +242,7 @@ class Config implements ConfigInterface, GeneratorInterface
     public function unsetRoute(string $line): ConfigInterface
     {
         unset($this->routes[$line]);
+
         return $this;
     }
 
@@ -257,6 +256,7 @@ class Config implements ConfigInterface, GeneratorInterface
     public function setRemote(string $line): ConfigInterface
     {
         $this->remotes[] = trim($line, '"');
+
         return $this;
     }
 
@@ -270,17 +270,8 @@ class Config implements ConfigInterface, GeneratorInterface
     public function unsetRemote(string $line): ConfigInterface
     {
         unset($this->remotes[$line]);
-        return $this;
-    }
 
-    /**
-     * Alias to set
-     *
-     * @deprecated TODO: Delete in future releases
-     */
-    public function add(string $name, $value = null): ConfigInterface
-    {
-        return $this->set($name, $value);
+        return $this;
     }
 
     /**
@@ -354,6 +345,7 @@ class Config implements ConfigInterface, GeneratorInterface
     public function generate(string $type = 'raw')
     {
         $generator = new Generator($this);
+
         return $generator->generate($type);
     }
 
@@ -410,7 +402,7 @@ class Config implements ConfigInterface, GeneratorInterface
      * @return void
      * @throws \RuntimeException
      */
-    public function __unset(string $name)
+    public function __unset(string $name): void
     {
         // Inform about deleting push
         if ($name === 'push') {
@@ -455,14 +447,15 @@ class Config implements ConfigInterface, GeneratorInterface
         $type = mb_strtolower($type);
         Helpers::isCertAllowed($type);
         unset($this->certs[$type]);
+
         return $this;
     }
 
     /**
      * Set scope of certs
      *
-     * @param \OpenVPN\Types\Cert[] $certs
-     * @param bool                  $loadCertificates
+     * @param \OpenVPN\Types\Cert[]|string[] $certs
+     * @param bool                           $loadCertificates
      *
      * @return \OpenVPN\Interfaces\ConfigInterface
      */
@@ -484,7 +477,7 @@ class Config implements ConfigInterface, GeneratorInterface
     /**
      * Set scope of unique pushes
      *
-     * @param \OpenVPN\Types\Push[] $pushes
+     * @param \OpenVPN\Types\Push[]|string[] $pushes
      *
      * @return \OpenVPN\Interfaces\ConfigInterface
      */
@@ -500,7 +493,7 @@ class Config implements ConfigInterface, GeneratorInterface
     /**
      * Set scope of unique routes
      *
-     * @param \OpenVPN\Types\Route[] $routes
+     * @param \OpenVPN\Types\Route[]|string[] $routes
      *
      * @return \OpenVPN\Interfaces\ConfigInterface
      */
@@ -516,7 +509,7 @@ class Config implements ConfigInterface, GeneratorInterface
     /**
      * Set scope of unique remotes
      *
-     * @param \OpenVPN\Types\Remote[] $remotes
+     * @param \OpenVPN\Types\Remote[]|string[] $remotes
      *
      * @return \OpenVPN\Interfaces\ConfigInterface
      */
@@ -532,7 +525,7 @@ class Config implements ConfigInterface, GeneratorInterface
     /**
      * Set scope of unique parameters
      *
-     * @param \OpenVPN\Types\Parameter[] $parameters
+     * @param \OpenVPN\Types\Parameter[]|string[] $parameters
      *
      * @return \OpenVPN\Interfaces\ConfigInterface
      */

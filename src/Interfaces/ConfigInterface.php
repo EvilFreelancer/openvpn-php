@@ -5,11 +5,6 @@ namespace OpenVPN\Interfaces;
 interface ConfigInterface
 {
     /**
-     * List of types of certs, for validation
-     */
-    public const ALLOWED_TYPES_OF_CERTS = ['ca', 'cert', 'key', 'dh', 'tls-auth', 'secret', 'pkcs12'];
-
-    /**
      * Alias for client line of config
      *
      * @return \OpenVPN\Interfaces\ConfigInterface
