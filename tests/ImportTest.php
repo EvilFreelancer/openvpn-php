@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenVPN\Tests;
+namespace Tests\OpenVPN;
 
 use OpenVPN\Config;
 use OpenVPN\Import;
@@ -18,7 +18,7 @@ class ImportTest extends TestCase
      */
     private $config;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->import = new Import();
         $this->config = new Config();
@@ -94,7 +94,6 @@ class ImportTest extends TestCase
             'local vpn.example.com',
             'port 1194',
             'resolv-retry infinite',
-
             'cipher AES-256-CBC',
             'redirect-gateway',
             'server 10.8.0.0 255.255.255.0',
@@ -134,7 +133,7 @@ class ImportTest extends TestCase
 
         $object = $this->import->parse();
 
-        $this->assertInstanceOf(Config::class, $object);
+        self::assertInstanceOf(Config::class, $object);
 
         // For tests
         $pushes = $object->getPushes();
@@ -142,10 +141,10 @@ class ImportTest extends TestCase
         $routes = $object->getRoutes();
         $params = $object->getParameters();
 
-        $this->assertCount(6, $pushes);
-        $this->assertCount(4, $certs);
-        $this->assertCount(5, $routes);
-        $this->assertCount(25, $params);
+        self::assertCount(6, $pushes);
+        self::assertCount(4, $certs);
+        self::assertCount(5, $routes);
+        self::assertCount(25, $params);
     }
 
     public function testRead(): void
@@ -160,10 +159,10 @@ class ImportTest extends TestCase
         $routes = $object->getRoutes();
         $params = $object->getParameters();
 
-        $this->assertCount(6, $pushes);
-        $this->assertCount(4, $certs);
-        $this->assertCount(5, $routes);
-        $this->assertCount(25, $params);
+        self::assertCount(6, $pushes);
+        self::assertCount(4, $certs);
+        self::assertCount(5, $routes);
+        self::assertCount(25, $params);
     }
 
     public function testLoad(): void
@@ -181,9 +180,9 @@ class ImportTest extends TestCase
         $routes = $object->getRoutes();
         $params = $object->getParameters();
 
-        $this->assertCount(6, $pushes);
-        $this->assertCount(4, $certs);
-        $this->assertCount(5, $routes);
-        $this->assertCount(25, $params);
+        self::assertCount(6, $pushes);
+        self::assertCount(4, $certs);
+        self::assertCount(5, $routes);
+        self::assertCount(25, $params);
     }
 }
