@@ -14,8 +14,8 @@ class ServiceProvider extends BaseServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            __DIR__ . '/../../configs/openvpn-client.php' => config_path('openvpn-client.php'),
-            __DIR__ . '/../../configs/openvpn-server.php' => config_path('openvpn-server.php'),
+            __DIR__ . '/../../config/openvpn-client.php' => config_path('openvpn-client.php'),
+            __DIR__ . '/../../config/openvpn-server.php' => config_path('openvpn-server.php'),
         ]);
     }
 
@@ -27,13 +27,13 @@ class ServiceProvider extends BaseServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../../configs/openvpn-client.php', 'openvpn-client'
+            __DIR__ . '/../../config/openvpn-client.php', 'openvpn-client'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/../../configs/openvpn-server.php', 'openvpn-server'
+            __DIR__ . '/../../config/openvpn-server.php', 'openvpn-server'
         );
 
-        $this->app->bind(ConfigWrapper::class);
+        $this->app->bind(Wrapper::class);
     }
 }
