@@ -320,6 +320,11 @@ class Config implements ConfigInterface, GeneratorInterface
         // Set new value
         $this->parameters[$name] = $value;
 
+        // Ability to unset param
+        if (is_null ($value)) {
+            unset ($this->parameters[$name]);
+        }
+        
         return $this;
     }
 
