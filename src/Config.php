@@ -307,6 +307,12 @@ class Config implements ConfigInterface, GeneratorInterface
             return $this->setRoute($value);
         }
 
+        
+        // Ability to unset param
+        if (is_null ($value)) {
+            unset ($this->parameters[$name]);
+        }
+        
         // Check if provided value is boolean and if it's true, then set null (that mean parameter without value)
         if (is_bool($value) && $value) {
             if ($value) {
@@ -319,11 +325,6 @@ class Config implements ConfigInterface, GeneratorInterface
 
         // Set new value
         $this->parameters[$name] = $value;
-
-        // Ability to unset param
-        if (is_null ($value)) {
-            unset ($this->parameters[$name]);
-        }
         
         return $this;
     }
